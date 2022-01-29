@@ -20,6 +20,7 @@ class MinimizeLinkController extends Controller
         $data = $request->validated();
         $data['code'] = Str::random(15);
         session()->put('link', $data['link']);
+        session()->put('code', $data['code']);
 
         return response()->json([
             'success' => 'Выполнено!',
@@ -29,6 +30,8 @@ class MinimizeLinkController extends Controller
 
     public function redirectToMinLink()
     {
+        if (session()->get('code') !== \request()->query('code'))
+            abort(404);
         return redirect(session()->get('link'));
     }
 }

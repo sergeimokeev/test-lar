@@ -3,11 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\MinimizeLinkRequest;
-use App\Models\MinimizedLinks;
 use App\Services\MinimizeLinkService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Validation\ValidationException;
 
 
 class MinimizeLinkController extends Controller
@@ -17,30 +15,20 @@ class MinimizeLinkController extends Controller
         return view('form');
     }
 
-    public function store(MinimizedLinks $linksModel ,MinimizeLinkRequest $request): \Illuminate\Http\JsonResponse
+    public function store(MinimizeLinkRequest $request): \Illuminate\Http\JsonResponse
     {
-        try {
-            $data = $request->validated();
-        } catch (ValidationException $exception) {
-            info($exception);
-            return response()->json([
-                'error' => $exception->getMessage(),
-            ]);
-        }
-
+        $data = $request->validated();
         $data['code'] = Str::random(15);
-
-        $linksModel->create($data);
+        session()->put('link', $data['link']);
 
         return response()->json([
             'success' => 'Выполнено!',
-            'link' => $data['link'],
             'minlink' => route('minimizedLink', ['code' => $data['code']]),
         ]);
     }
 
-    public function redirectToMinLink(MinimizedLinks $minimizedLinks, $code)
+    public function redirectToMinLink()
     {
-        return redirect($minimizedLinks->where('code', $code)->first()->link);
+        return redirect(session()->get('link'));
     }
 }

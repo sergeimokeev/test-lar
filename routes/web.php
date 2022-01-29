@@ -20,4 +20,4 @@ Route::get('/', function () {
 
 Route::get('/form', [MinimizeLinkController::class, 'index']);
 Route::post('/form', [MinimizeLinkController::class, 'store']);
-Route::get('/min-link/{code}', [MinimizeLinkController::class, 'redirectToMinLink'])->name('minimizedLink');
+Route::get('/min-link', [MinimizeLinkController::class, 'redirectToMinLink'])->name('minimizedLink');

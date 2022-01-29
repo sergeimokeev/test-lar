@@ -1,0 +1,43 @@
+version: '3.3'
+
+services:
+
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx.dockerfile
+    container_name: prof-nginx
+    volumes:
+      - ./:/var/www/prof-test
+    ports:
+      - 127.0.0.1:8080:80
+    links:
+      - php
+
+  php:
+    build:
+      context: .
+      dockerfile: docker/php-fpm.dockerfile
+    container_name: prof-php
+    user: "${UID}:${GID}"
+    volumes:
+      - ./:/var/www/prof-test
+      - ./docker/php-ini:/usr/local/etc/php/custom.d
+    environment:
+      PHP_INI_SCAN_DIR: "/usr/local/etc/php/custom.d:/usr/local/etc/php/conf.d"
+    links:
+      - postgre
+
+  postgre:
+    build:
+      context: .
+      dockerfile: docker/postgre.dockerfile
+    container_name: prof-postgre
+    volumes:
+      - ./Makefile:/Makefile
+    ports:
+      - 127.0.0.1:53307:5432
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=root
+      - POSTGRES_DB=prof_db
